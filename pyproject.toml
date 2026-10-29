@@ -1,0 +1,15 @@
+[project]
+name = "slangsense"
+version = "0.1.0"
+description = "Fine-tuning small open-weight LLMs to read crypto sentiment and slang"
+requires-python = ">=3.11,<3.12"
+dependencies = [
+    "huggingface-hub>=2.4.0",
+    "openpyxl>=3.1.5",
+    "pandas>=3.1.0",
+]
+
+[dependency-groups]
+dev = [
+    "ipykernel>=7.4.0",
+]
