@@ -1,0 +1,22 @@
+# Generated or heavy folders end in .nosync so iCloud skips them
+*.nosync
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Jupyter
+.ipynb_checkpoints/
+
+# macOS
+.DS_Store
+
+# Model weights and adapters
+*.safetensors
+*.bin
+*.gguf
+*.pt
+
+# Secrets
+.env
