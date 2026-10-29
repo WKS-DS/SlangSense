@@ -41,7 +41,7 @@ StockTwits crypto posts
         │
    Data prep ──► train / val / held-out pool
         │
-   Hand-labeled test set (~300 posts, slang flagged)
+   Hand-labeled test set (150 slang-heavy + 150 plain posts)
         │
    ┌────────┬─────────┬────────────┬──────────────┬────────────┐
  VADER   FinBERT  CryptoBERT  LLM zero/few-shot  LLM + LoRA
@@ -49,16 +49,18 @@ StockTwits crypto posts
         │
    One evaluation script ──► metrics, slang vs plain, error analysis
         │
-   Fine-tuned model hosted locally ──► latency
+   Fine-tuned model hosted locally ──► latency (optional)
 ```
 
 ---
 
 ## Data
 
-- **Training data:** [`ElKulako/stocktwits-crypto`](https://huggingface.co/datasets/ElKulako/stocktwits-crypto), StockTwits crypto posts (Nov 2021 – Jun 2022), MIT license.
-- **Test set:** ~300 posts labeled by hand, each flagged as slang-heavy or plain.
-- **Known caveat:** CryptoBERT was fine-tuned on posts from the same StockTwits dataset, so its scores may be optimistic. This is discussed in the results.
+- **Training data:** [`ElKulako/stocktwits-crypto`](https://huggingface.co/datasets/ElKulako/stocktwits-crypto), 1.33M StockTwits crypto posts (Nov 2021 – Jun 2022), MIT license. The labels are the authors' own tags: **bullish** or **bearish**, plus **neutral** for posts the author left untagged ([source](https://huggingface.co/datasets/ElKulako/stocktwits-crypto/discussions/3)). After removing duplicates, balanced samples are drawn for training (30k posts) and validation (3k).
+- **Test set:** 300 posts from a separate held-out pool, labeled by hand: 150 slang-heavy and 150 plain. Slang is oversampled on purpose, so results are reported for each group separately. The author's tag is kept for comparison.
+- **Known caveats:**
+  - Author tags are noisy, and "neutral" really means "untagged", so models trained on these tags learn that noise. The hand-labeled test set measures real sentiment instead.
+  - CryptoBERT was fine-tuned on posts from the same StockTwits dataset, so its scores may be optimistic.
 
 ---
 
@@ -66,10 +68,11 @@ StockTwits crypto posts
 
 - Macro-F1 (primary) and per-class precision / recall / F1
 - Confusion matrices
-- Accuracy on slang-heavy vs plain posts
+- Every metric reported separately for slang-heavy and plain posts
+- How common slang is across the full dataset
 - Agreement between authors' own tags and hand labels
 - Invalid-output rate for the LLM (replies that aren't a valid label)
-- Inference latency with the fine-tuned model running locally
+- Inference latency with the fine-tuned model running locally (optional)
 
 ---
 
@@ -88,7 +91,24 @@ SlangSense/
 
 ## Getting started
 
-Setup instructions will be added as the project is built.
+Requires [uv](https://docs.astral.sh/uv/) and Python 3.11 (uv can install it for you).
+
+```bash
+git clone <this repo's URL>
+cd SlangSense
+
+# Optional: keeps the environment out of iCloud sync if the folder is on a synced Mac Desktop.
+# Skip this line to use uv's default .venv folder.
+export UV_PROJECT_ENVIRONMENT=venv.nosync
+
+uv sync
+```
+
+Open the notebooks in VS Code, select the environment's Python (`venv.nosync` or `.venv`) as the kernel, and run them in order:
+
+| Notebook | What it does | Runs on |
+|---|---|---|
+| `01_data_prep.ipynb` | Downloads and cleans the dataset; writes the train / val / test-pool splits | Mac, about 1 minute |
 
 ---
 
