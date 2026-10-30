@@ -174,6 +174,7 @@ Seven stages: Stages 1–6 are required and Stage 7 is optional. Each stage gets
   - `notebooks/05_lora_finetune.ipynb`, which runs on a Colab T4:
     - Clones the repo to get `src/` and `data/processed/`, and installs `peft`, `trl` and `bitsandbytes` in Colab only.
     - Loads the base model in 4-bit and trains it to answer the Stage 4 zero-shot prompt with the label word, with the loss computed on the answer only.
+    - **Convergence tests before the full run** (required by the professor): (1) overfit about 50 posts, where loss should fall close to zero; (2) a short run on about 1,000 posts, where training and validation loss should both drop and replies should be valid labels. The short run also measures time per step, to estimate the full run.
     - Tracks validation loss, saves checkpoints and the adapter to Google Drive, and predicts on the test set.
   - `results/preds_llm_lora.csv`, downloaded from Colab and committed. The adapter goes in `models.nosync/` locally and is never committed.
 - **New concepts:** LoRA, 4-bit quantization, QLoRA, training vs validation loss.
