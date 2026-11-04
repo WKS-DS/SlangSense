@@ -94,7 +94,7 @@ SlangSense/
 Requires [uv](https://docs.astral.sh/uv/) and Python 3.11 (uv can install it for you).
 
 ```bash
-git clone <this repo's URL>
+git clone https://github.com/WKS-DS/SlangSense.git
 cd SlangSense
 
 # Optional: keeps the environment out of iCloud sync if the folder is on a synced Mac Desktop.
