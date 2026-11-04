@@ -32,7 +32,7 @@ Instructions for Claude Code. Read this whole file before doing any work in this
 ### Known caveats (keep these visible in results)
 
 - CryptoBERT was fine-tuned on 2M posts from the **same** StockTwits dataset, so its test score is likely optimistic.
-- StockTwits labels are probably author-tagged, so they're noisy (sarcasm, hype).
+- StockTwits labels are the authors' own tags, and "neutral" means the author left the post **untagged** (confirmed by the dataset author). So the training labels are noisy (sarcasm, hype, untagged posts that still carry an opinion).
 - The dataset was lowercased, with cashtags, usernames, and URLs removed.
 - The test set is 50% slang-heavy by design, far above the natural rate. That's why results are reported per group: a single combined score over-represents slang.
 
@@ -105,7 +105,7 @@ Seven stages: Stages 1–6 are required and Stage 7 is optional. Each stage gets
 
 **Every stage ends the same way:** notebooks run top to bottom → README "Getting started" covers the new step → checkbox ticked and summary added below → Will confirms → merge into `main`, push, delete the branch.
 
-- [ ] Stage 1: Setup and data prep
+- [x] Stage 1: Setup and data prep
 - [ ] Stage 2: Slang list and hand-labeled test set
 - [ ] Stage 3: Evaluation module and classic baselines
 - [ ] Stage 4: LLM prompting (zero-shot and few-shot)
@@ -125,9 +125,10 @@ Seven stages: Stages 1–6 are required and Stage 7 is optional. Each stage gets
     - Sets aside the held-out pool **first**, then draws a balanced training set (about 30k, 10k per class) and a validation set (about 3k).
   - `data/processed/train.csv`, `val.csv`, `test_pool.csv`. The pool holds about 15k posts, balanced by author tag; Stage 2 checks it has enough slang posts.
   - The full cleaned dataset saved to `data/interim.nosync/` (not committed), for the slang-rate count in Stage 2.
-- **Packages:** `datasets` (loading), `pandas`, `scikit-learn` (stratified splits, and metrics later), `ipykernel` (notebooks in VS Code).
+- **Packages:** `huggingface_hub` (download), `openpyxl` (the dataset is an Excel file), `pandas`, `ipykernel` (notebooks in VS Code). `datasets` and `scikit-learn` turned out not to be needed yet.
 - **Done when:** the notebook runs top to bottom; split sizes and class counts match the targets; no post text appears in two splits; the notebook explains in plain words what "neutral" means. Check the GitHub account and **ask Will before the first push**.
 - **Watch for:** if "neutral" turns out to mean "the author didn't tag it", the training neutral class is noisy. Flag it and decide with Will before moving on.
+- **Summary:** Set up the repo, the uv environment and `.gitignore`. Notebook 01 downloads the 1.33M-post dataset (one Excel file with two sheets) and removes 151 empty rows, about 39k exact duplicates and 37k near duplicates (bot reposts that only change a price). It then draws balanced splits: 30k train, 3k val and a 15k test pool, with the pool set aside first so nothing leaks into the test set. The dataset author confirmed that labels are the authors' own tags and that "neutral" means untagged. That makes the training labels noisy, and it's the main reason the test set is labeled by hand.
 
 #### Stage 2: Slang list and hand-labeled test set (`stage-2-test-set`)
 
@@ -173,6 +174,7 @@ Seven stages: Stages 1–6 are required and Stage 7 is optional. Each stage gets
   - `notebooks/05_lora_finetune.ipynb`, which runs on a Colab T4:
     - Clones the repo to get `src/` and `data/processed/`, and installs `peft`, `trl` and `bitsandbytes` in Colab only.
     - Loads the base model in 4-bit and trains it to answer the Stage 4 zero-shot prompt with the label word, with the loss computed on the answer only.
+    - **Convergence tests before the full run** (required by the professor): (1) overfit about 50 posts, where loss should fall close to zero; (2) a short run on about 1,000 posts, where training and validation loss should both drop and replies should be valid labels. The short run also measures time per step, to estimate the full run.
     - Tracks validation loss, saves checkpoints and the adapter to Google Drive, and predicts on the test set.
   - `results/preds_llm_lora.csv`, downloaded from Colab and committed. The adapter goes in `models.nosync/` locally and is never committed.
 - **New concepts:** LoRA, 4-bit quantization, QLoRA, training vs validation loss.
