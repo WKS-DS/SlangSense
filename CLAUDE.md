@@ -135,6 +135,7 @@ Seven stages: Stages 1–6 are required and Stage 7 is optional. Each stage gets
 - **Goal:** The 300-post hand-labeled test set (150 slang-heavy + 150 plain) and the natural slang rate.
 - **Deliverables:**
   - `data/slang.csv` (`term, meaning`; about 100 lowercase terms including variants, e.g. `hodl`, `hodling`, `hodler`). Claude drafts it and Will reviews and edits it before any sampling.
+    - Rules (agreed with Will): crypto-specific slang only, as text (no emojis, which are hard to read in sarcastic or meme posts). Left out: general internet slang (lol, bro), common market words (pump, dump, dip, ath, bull run, bull/bear trap, dead cat bounce, death/golden cross, dca), the label words `bullish` / `bearish`, and crude terms (the repo is public).
   - `notebooks/02_test_set.ipynb`:
     - Automatic slang flag: whole-word and whole-phrase matching against `slang.csv`.
     - Natural slang rate: the share of posts in the full cleaned dataset with at least one slang term, overall and per class.
