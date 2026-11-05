@@ -109,6 +109,7 @@ Open the notebooks in VS Code, select the environment's Python (`venv.nosync` or
 | Notebook | What it does | Runs on |
 |---|---|---|
 | `01_data_prep.ipynb` | Downloads and cleans the dataset; writes the train / val / test-pool splits | Mac, about 1 minute |
+| `02_test_set.ipynb` | Flags crypto slang, measures how common it is, and draws the 300-post test set. After hand-labeling, checks the labels and writes `data/test_hand_labeled.csv` | Mac, under 1 minute |
 
 ---
 
