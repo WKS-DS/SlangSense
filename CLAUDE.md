@@ -108,7 +108,7 @@ Seven stages: Stages 1–6 are required and Stage 7 is optional. Each stage gets
 
 - [x] Stage 1: Setup and data prep
 - [x] Stage 2: Slang list and hand-labeled test set
-- [ ] Stage 3: Evaluation module and classic baselines
+- [x] Stage 3: Evaluation module and classic baselines
 - [ ] Stage 4: LLM prompting (zero-shot and few-shot)
 - [ ] Stage 5: QLoRA fine-tune (Colab)
 - [ ] Stage 6: Final evaluation and write-up
@@ -155,9 +155,10 @@ Seven stages: Stages 1–6 are required and Stage 7 is optional. Each stage gets
   - `src/evaluate.py`: reads any `preds_<model>.csv`, checks that it covers every test post, and returns macro-F1, per-class P/R/F1, the confusion matrix and the invalid-output rate. Each is computed for all posts, slang-heavy posts and plain posts. `INVALID` counts as wrong.
   - `src/labels.py`: adds the VADER threshold rule and the FinBERT / CryptoBERT label maps.
   - `notebooks/03_baselines.ipynb`: runs VADER, FinBERT and CryptoBERT, writing `results/preds_vader.csv`, `preds_finbert.csv` and `preds_cryptobert.csv`. It also writes the author's tags as `preds_author_tag.csv`, so author-vs-hand agreement goes through the same scorer. Ends with a small score table from `evaluate.py`.
-- **Packages:** `vaderSentiment`, `transformers` + `torch` (FinBERT, CryptoBERT), `matplotlib` (confusion matrices).
+- **Packages:** `vaderSentiment`, `transformers` + `torch` (FinBERT, CryptoBERT). Confusion matrices are shown as tables here, so `matplotlib` waits until Stage 6's figures.
 - **New concepts:** macro-F1, confusion matrix.
 - **Done when:** all four prediction files cover the 300 posts and score without errors, and the CryptoBERT caveat appears next to its score.
+- **Summary:** `src/evaluate.py` is the single scorer: it checks that a preds file covers all 300 posts and computes macro-F1, accuracy, per-class P/R/F1, the confusion matrix and the invalid rate for all, slang-heavy and plain posts (verified against scikit-learn). Notebook 03 scored VADER, FinBERT and CryptoBERT, plus the author tags as if they were a model. Macro-F1 on all posts: author tags 0.45, VADER 0.40, FinBERT 0.37, CryptoBERT 0.47, against 0.23 for always guessing neutral. FinBERT drops on slang-heavy posts (0.30 vs 0.42 on plain) and calls most posts neutral. CryptoBERT acts like the author tags it was trained on and rarely predicts neutral.
 
 #### Stage 4: LLM prompting (`stage-4-llm-prompting`)
 
@@ -194,6 +195,7 @@ Seven stages: Stages 1–6 are required and Stage 7 is optional. Each stage gets
     - Reports author-tag vs hand-label agreement and invalid-output rates.
     - Ends with a short error analysis: a few slang posts the models got wrong.
   - README: results table, one or two figures, caveats, and a complete "Getting started".
+- **Packages:** `matplotlib` (figures).
 - **Done when:** the notebook runs top to bottom, the README numbers match `metrics.csv`, and every caveat from section 1 appears in the README.
 
 #### Stage 7 (optional): Local hosting and latency (`stage-7-local`)

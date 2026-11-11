@@ -112,6 +112,7 @@ Open the notebooks in VS Code, select the environment's Python (`venv.nosync` or
 |---|---|---|
 | `01_data_prep.ipynb` | Downloads and cleans the dataset; writes the train / val / test-pool splits | Mac, about 1 minute |
 | `02_test_set.ipynb` | Flags crypto slang, measures how common it is, and draws the 300-post test set. After hand-labeling, checks the labels and writes `data/test_hand_labeled.csv` | Mac, under 1 minute |
+| `03_baselines.ipynb` | Runs VADER, FinBERT and CryptoBERT on the test set, also scores the author tags, and compares them all with `src/evaluate.py` | Mac, about 1 minute (plus a one-time ~1 GB model download) |
 
 ---
 
