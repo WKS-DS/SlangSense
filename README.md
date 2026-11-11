@@ -41,7 +41,7 @@ StockTwits crypto posts
         │
    Data prep ──► train / val / held-out pool
         │
-   Hand-labeled test set (150 slang-heavy + 150 plain posts)
+   Hand-labeled test set (300 posts, half slang-heavy)
         │
    ┌────────┬─────────┬────────────┬──────────────┬────────────┐
  VADER   FinBERT  CryptoBERT  LLM zero/few-shot  LLM + LoRA
@@ -57,9 +57,11 @@ StockTwits crypto posts
 ## Data
 
 - **Training data:** [`ElKulako/stocktwits-crypto`](https://huggingface.co/datasets/ElKulako/stocktwits-crypto), 1.33M StockTwits crypto posts (Nov 2021 – Jun 2022), MIT license. The labels are the authors' own tags: **bullish** or **bearish**, plus **neutral** for posts the author left untagged ([source](https://huggingface.co/datasets/ElKulako/stocktwits-crypto/discussions/3)). After removing duplicates, balanced samples are drawn for training (30k posts) and validation (3k).
-- **Test set:** 300 posts from a separate held-out pool, labeled by hand: 150 slang-heavy and 150 plain. Slang is oversampled on purpose, so results are reported for each group separately. The author's tag is kept for comparison.
+- **Slang:** [`data/slang.csv`](data/slang.csv) lists 118 crypto slang terms (*hodl*, *fud*, *rekt*, *wagmi*, *diamond hands*, ...) with their meanings. About 7% of all posts contain at least one.
+- **Test set:** 300 posts from a separate held-out pool, labeled by hand without seeing the author tags: 149 slang-heavy and 151 plain, with 79 bullish, 62 bearish and 159 neutral. Slang is oversampled on purpose, so results are reported for each group separately. The author's tag is kept for comparison.
 - **Known caveats:**
   - Author tags are noisy, and "neutral" really means "untagged", so models trained on these tags learn that noise. The hand-labeled test set measures real sentiment instead.
+  - Bearish is the smallest class in the test set (about 30 posts per group), so its per-group scores are noisy.
   - CryptoBERT was fine-tuned on posts from the same StockTwits dataset, so its scores may be optimistic.
 
 ---
@@ -109,6 +111,7 @@ Open the notebooks in VS Code, select the environment's Python (`venv.nosync` or
 | Notebook | What it does | Runs on |
 |---|---|---|
 | `01_data_prep.ipynb` | Downloads and cleans the dataset; writes the train / val / test-pool splits | Mac, about 1 minute |
+| `02_test_set.ipynb` | Flags crypto slang, measures how common it is, and draws the 300-post test set. After hand-labeling, checks the labels and writes `data/test_hand_labeled.csv` | Mac, under 1 minute |
 
 ---
 
