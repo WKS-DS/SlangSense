@@ -34,7 +34,8 @@ Instructions for Claude Code. Read this whole file before doing any work in this
 - CryptoBERT was fine-tuned on 2M posts from the **same** StockTwits dataset, so its test score is likely optimistic.
 - StockTwits labels are the authors' own tags, and "neutral" means the author left the post **untagged** (confirmed by the dataset author). So the training labels are noisy (sarcasm, hype, untagged posts that still carry an opinion).
 - The dataset was lowercased, with cashtags, usernames, and URLs removed.
-- The test set is 50% slang-heavy by design, far above the natural rate. That's why results are reported per group: a single combined score over-represents slang.
+- The test set is 50% slang-heavy by design, far above the natural rate (about 7%). That's why results are reported per group: a single combined score over-represents slang.
+- The hand labels are 53% neutral (79 bullish, 62 bearish, 159 neutral), so bearish has only about 30 posts per group and its per-group scores are noisy. Macro-F1 weights classes equally, so guessing neutral doesn't score well.
 
 ### Repo layout
 
@@ -106,7 +107,7 @@ Seven stages: Stages 1–6 are required and Stage 7 is optional. Each stage gets
 **Every stage ends the same way:** notebooks run top to bottom → README "Getting started" covers the new step → checkbox ticked and summary added below → Will confirms → merge into `main`, push, delete the branch.
 
 - [x] Stage 1: Setup and data prep
-- [ ] Stage 2: Slang list and hand-labeled test set
+- [x] Stage 2: Slang list and hand-labeled test set
 - [ ] Stage 3: Evaluation module and classic baselines
 - [ ] Stage 4: LLM prompting (zero-shot and few-shot)
 - [ ] Stage 5: QLoRA fine-tune (Colab)
@@ -135,6 +136,7 @@ Seven stages: Stages 1–6 are required and Stage 7 is optional. Each stage gets
 - **Goal:** The 300-post hand-labeled test set (150 slang-heavy + 150 plain) and the natural slang rate.
 - **Deliverables:**
   - `data/slang.csv` (`term, meaning`; about 100 lowercase terms including variants, e.g. `hodl`, `hodling`, `hodler`). Claude drafts it and Will reviews and edits it before any sampling.
+    - Rules (agreed with Will): crypto-specific slang only, as text (no emojis, which are hard to read in sarcastic or meme posts). Left out: general internet slang (lol, bro), common market words (pump, dump, dip, ath, bull run, bull/bear trap, dead cat bounce, death/golden cross, dca), the label words `bullish` / `bearish`, and crude terms (the repo is public).
   - `notebooks/02_test_set.ipynb`:
     - Automatic slang flag: whole-word and whole-phrase matching against `slang.csv`.
     - Natural slang rate: the share of posts in the full cleaned dataset with at least one slang term, overall and per class.
@@ -144,6 +146,7 @@ Seven stages: Stages 1–6 are required and Stage 7 is optional. Each stage gets
     - After Will labels: checks the sheet, joins the author's tag back by `post_id`, and writes `data/test_hand_labeled.csv`. It also reports the final group sizes, the mix of hand labels, and how often Will agreed with the automatic slang flag.
 - **Done when:** `test_hand_labeled.csv` has 300 rows with valid labels and flags, and the natural slang rate and the auto-vs-hand flag agreement are reported.
 - **Note:** posts are sampled by the automatic flag and author tag, but Will's slang flag and label are final. Group sizes and class balance may therefore move a little away from 150/150 and even classes. Report the actual counts.
+- **Summary:** Built a 118-term crypto slang list and a whole-word regex flag. About 7% of the 1.25M posts contain slang, so the test set (half slang-heavy) oversamples it on purpose. Notebook 02 drew 300 posts from the held-out pool (50 per slang flag × author tag group), and Will labeled them blind: 149 slang-heavy and 151 plain, with 99% agreement between the automatic and hand slang flags. The hand labels are 79 bullish, 62 bearish and 159 neutral. More than half the posts the authors tagged are neutral by hand, an early sign of how noisy the author tags are.
 
 #### Stage 3: Evaluation module and classic baselines (`stage-3-baselines`)
 
