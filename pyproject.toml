@@ -7,6 +7,9 @@ dependencies = [
     "huggingface-hub>=2.4.0",
     "openpyxl>=3.1.5",
     "pandas>=3.1.0",
+    "torch>=2.15.0",
+    "transformers>=5.22.2",
+    "vadersentiment>=3.3.2",
 ]
 
 [dependency-groups]
