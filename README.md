@@ -84,7 +84,7 @@ StockTwits crypto posts
 SlangSense/
 ├── data/          # processed splits, hand-labeled test set, slang list (raw data not committed)
 ├── notebooks/     # one notebook per stage
-├── src/           # shared code: label mapping, output parsing, evaluation
+├── src/           # shared code: label mapping, LLM prompt and reply parser, evaluation
 ├── results/       # predictions, metrics, figures
 └── README.md
 ```
@@ -113,6 +113,7 @@ Open the notebooks in VS Code, select the environment's Python (`venv.nosync` or
 | `01_data_prep.ipynb` | Downloads and cleans the dataset; writes the train / val / test-pool splits | Mac, about 1 minute |
 | `02_test_set.ipynb` | Flags crypto slang, measures how common it is, and draws the 300-post test set. After hand-labeling, checks the labels and writes `data/test_hand_labeled.csv` | Mac, under 1 minute |
 | `03_baselines.ipynb` | Runs VADER, FinBERT and CryptoBERT on the test set, also scores the author tags, and compares them all with `src/evaluate.py` | Mac, about 1 minute (plus a one-time ~1 GB model download) |
+| `04_llm_prompting.ipynb` | Asks Qwen2.5-1.5B-Instruct to label the test posts, zero-shot and few-shot, and scores both next to the baselines | Mac with Apple Silicon (GPU), about 6 minutes (plus a one-time ~3 GB model download) |
 
 ---
 

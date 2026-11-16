@@ -1,5 +1,7 @@
 """Label names and mappings shared by every notebook."""
 
+import re
+
 # The three labels every model must predict.
 LABELS = ["bullish", "bearish", "neutral"]
 
@@ -26,3 +28,12 @@ def vader_label(compound):
     if compound <= -0.05:
         return "bearish"
     return "neutral"
+
+
+def parse_reply(reply):
+    """Turn an LLM reply into a label, or INVALID unless exactly one label word appears in it."""
+    words = re.findall(r"[a-z]+", reply.lower())  # "Bullish." -> ["bullish"]
+    found = [label for label in LABELS if label in words]
+    if len(found) == 1:
+        return found[0]
+    return INVALID  # no label word, or more than one (e.g. "bullish or bearish")
