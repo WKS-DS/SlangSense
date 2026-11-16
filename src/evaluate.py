@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from src.labels import INVALID, LABELS
+from src.labels import INVALID, LABELS, parse_reply
 
 ROOT = Path(__file__).resolve().parents[1]
 TEST_PATH = ROOT / "data" / "test_hand_labeled.csv"
@@ -27,6 +27,15 @@ def save_preds(post_ids, pred_labels, model):
     preds = pd.DataFrame({"post_id": post_ids, "pred_label": pred_labels})
     RESULTS_DIR.mkdir(exist_ok=True)
     preds.to_csv(RESULTS_DIR / f"preds_{model}.csv", index=False)
+
+
+def save_replies(post_ids, replies, model):
+    """For an LLM: save its raw replies (for error analysis) and the labels parsed from them (for scoring)."""
+    pred_labels = [parse_reply(reply) for reply in replies]
+    pd.DataFrame({"post_id": post_ids, "reply": replies, "pred_label": pred_labels}).to_csv(
+        RESULTS_DIR / f"replies_{model}.csv", index=False
+    )
+    save_preds(post_ids, pred_labels, model)
 
 
 def load_preds(model, test):
