@@ -114,6 +114,9 @@ Open the notebooks in VS Code, select the environment's Python (`venv.nosync` or
 | `02_test_set.ipynb` | Flags crypto slang, measures how common it is, and draws the 300-post test set. After hand-labeling, checks the labels and writes `data/test_hand_labeled.csv` | Mac, under 1 minute |
 | `03_baselines.ipynb` | Runs VADER, FinBERT and CryptoBERT on the test set, also scores the author tags, and compares them all with `src/evaluate.py` | Mac, about 1 minute (plus a one-time ~1 GB model download) |
 | `04_llm_prompting.ipynb` | Asks Qwen2.5-1.5B-Instruct to label the test posts, zero-shot and few-shot, and scores both next to the baselines | Mac with Apple Silicon (GPU), about 6 minutes (plus a one-time ~3 GB model download) |
+| `05_lora_finetune.ipynb` | Fine-tunes the same model on the 30k training posts with QLoRA, after two quick convergence tests, then labels and scores the test set | Google Colab with a GPU, about 1 hour on an L4 (a free T4 is slower) |
+
+Notebook 05 runs on Google Colab, not the Mac: open it with the *Open in Colab* button at its top. It is set up for the free T4 GPU; if none is available, pick another GPU under *Runtime → Change runtime type* (the L4 needs Colab Pro). It saves its outputs to Google Drive (`MyDrive/SlangSense/`). Copy the CSV files to `results/`, and `adapter_config.json` and `adapter_model.safetensors` from `lora_adapter/` to `models.nosync/lora_adapter/`.
 
 ---
 
