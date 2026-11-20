@@ -5,6 +5,7 @@ Each model writes results/preds_<model>.csv with two columns, post_id and pred_l
 
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 from src.labels import INVALID, LABELS, parse_reply
@@ -93,23 +94,53 @@ def score_posts(true, pred):
     }
 
 
-def evaluate(model):
-    """Score results/preds_<model>.csv on all posts, slang-heavy posts and plain posts."""
+def test_with_preds(model):
+    """The test posts with the model's prediction added as a pred_label column."""
     test = load_test()
-    merged = test.merge(load_preds(model, test), on="post_id")
+    return test.merge(load_preds(model, test), on="post_id")
 
+
+def select_group(posts, group):
+    """All posts, or only the slang-heavy or plain ones (by the hand slang flag)."""
+    flag = GROUPS[group]
+    return posts if flag is None else posts[posts["slang"] == flag]
+
+
+def evaluate(model, truth="label"):
+    """Score results/preds_<model>.csv on all posts, slang-heavy posts and plain posts.
+
+    truth is the column the predictions are compared with: "label" (the hand labels, the
+    default) or "author_label" (the authors' own tags, to see which models learned them).
+    """
+    merged = test_with_preds(model)
     results = {}
-    for group, flag in GROUPS.items():
-        posts = merged if flag is None else merged[merged["slang"] == flag]
-        results[group] = score_posts(posts["label"], posts["pred_label"])
+    for group in GROUPS:
+        posts = select_group(merged, group)
+        results[group] = score_posts(posts[truth], posts["pred_label"])
     return results
 
 
-def score_table(models):
+def bootstrap_macro_f1(model, group="all", resamples=1000, seed=42):
+    """Macro-F1 on 1,000 resamples of the test posts, each drawn at random with replacement.
+
+    The spread of these scores shows how much a score could move with a different sample
+    of 300 posts. The same seed draws the same resamples for every model, so two models
+    can be compared resample by resample.
+    """
+    posts = select_group(test_with_preds(model), group)
+    rng = np.random.default_rng(seed)
+    scores = []
+    for _ in range(resamples):
+        sample = posts.sample(len(posts), replace=True, random_state=rng)
+        scores.append(score_posts(sample["label"], sample["pred_label"])["macro_f1"])
+    return np.array(scores)
+
+
+def score_table(models, truth="label"):
     """One row per model and group, with the headline numbers."""
     rows = []
     for model in models:
-        for group, scores in evaluate(model).items():
+        for group, scores in evaluate(model, truth).items():
             rows.append({
                 "model": model,
                 "group": group,
